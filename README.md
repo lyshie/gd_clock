@@ -8,6 +8,10 @@ Usage
 
     # ./clock.sh
 
+Screentshots
+------------
+![clock.sh](screenshot.png)
+
 Author
 ------
     SHIE, Li-Yi <lyshie@mx.nthu.edu.tw>
