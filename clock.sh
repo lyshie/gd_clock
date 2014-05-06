@@ -1,6 +1,11 @@
 #!/bin/sh
 
-CLOCK="./gd_clock.pl"
+CLOCK="$(dirname $0)/gd_clock.pl"
 FONT_NAME="/opt/local/fonts/lyshie/LiHeiPro.ttf"
 
-watch -t -n 1 "$CLOCK $FONT_NAME 10 '%F'; $CLOCK $FONT_NAME 16 '%T'"
+if [ -z "$1" ]; then
+    watch -t -n 0.5 "$0 clock"
+else
+    $CLOCK -n "$FONT_NAME" -p 10 -s "$(date +%F)"
+    $CLOCK -n "$FONT_NAME" -p 15 -s "$(date +%T)"
+fi

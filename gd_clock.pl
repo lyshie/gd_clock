@@ -3,7 +3,7 @@
 #
 #         FILE: gd_clock.pl
 #
-#        USAGE: ./gd_clock.pl [TTF-FONT] [FONT-SIZE] [TIME-FORMAT]
+#        USAGE: ./gd_clock.pl
 #
 #  DESCRIPTION:
 #
@@ -23,6 +23,17 @@ use warnings;
 
 use GD;
 use POSIX qw(strftime);
+use Getopt::Long;
+use File::Basename;
+
+my %OPTS = (
+    width  => 1024,
+    height => 1024,
+    font   => '/opt/local/fonts/lyshie/funfonts/RADIOLAN.ttf',
+    size   => 20,
+    format => "%T",
+    string => undef,
+);
 
 sub graphToText {
     my ( $im, $bounds ) = @_;
@@ -51,13 +62,39 @@ sub graphToText {
     }
 }
 
-sub main {
-    my $width  = 1024;
-    my $height = 1024;
+sub helpMessage {
+    my $prog = basename($0);
 
-    my $font_name = $ARGV[0] // "/opt/local/fonts/lyshie/funfonts/RADIOLAN.ttf";
-    my $ptsize    = $ARGV[1] // 20;
-    my $time_format = $ARGV[2] // "%T";
+    print STDERR qq{Usage: $prog
+  -w, --width       Canvas width (default: 1024 pixels)
+  -h, --height      Canvas height (default: 1024 pixels)
+  -p, --size        Font size (default: 20pt)
+  -n, --font        Font name
+  -f, --format      Time format (default: %T)
+  -s, --string      Customized string
+  -h, --help        Help message}, "\n";
+
+    exit(1);
+}
+
+sub getOptions {
+    GetOptions( \%OPTS, "width|w=i", "height|h=i", "size|p=i", "font|n=s",
+        "format|f=s", "string|s=s", "help|h" => \&helpMessage, )
+      or helpMessage();
+}
+
+sub main {
+
+    # parse command line options
+    getOptions();
+
+    # set default options
+    my $width       = $OPTS{width};
+    my $height      = $OPTS{height};
+    my $font_name   = $OPTS{font};
+    my $ptsize      = $OPTS{size};
+    my $time_format = $OPTS{format};
+    my $string      = $OPTS{string};
 
     # create a new image
     my $im = new GD::Image( $width, $height );
@@ -71,8 +108,8 @@ sub main {
 
     @bounds = $im->stringFT(
         $black, $font_name, $ptsize, 0, 0,
-        $height / 2,
-        strftime( $time_format, localtime() )
+        $ptsize * 2,
+        $string ? $string : strftime( $time_format, localtime() )
     );
 
     # convert bitmap graph to text
