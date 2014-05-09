@@ -51,7 +51,7 @@ sub graphToText {
             my $index = $im->getPixel( $j, $i );
 
             if ($index) {
-                print "█";
+                print "▇";
             }
             else {
                 print " ";
